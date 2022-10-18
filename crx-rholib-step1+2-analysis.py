@@ -33,10 +33,20 @@ def bc_cre_agree_disagree(df, agree_or_disagree, read_type, outl):
     Output
         modifies outl in place and prints result
     """
-    
-    # to do
-    pass
+    if agree_or_disagree == "agree":
+        s = df.apply(lambda x: x.lib_id_from_bc == x.lib_id_from_cre and 
+                                    not math.isnan(x.lib_id_from_bc), axis=1)
+    elif agree_or_disagree == "disagree":
+        s = df.apply(lambda x: x.lib_id_from_bc != x.lib_id_from_cre and 
+                                   not math.isnan(x.lib_id_from_bc) and 
+                                   not math.isnan(x.lib_id_from_cre), axis=1)
+    else:
+        raise SystemError("choice must be 'agree' or 'disagree'")
+        
+    t = s.value_counts().get(True)
+    f = s.value_counts().get(False)
 
+    make_output(f"% of {read_type} reads with valid BC and valid CRE that {agree_or_disagree}", t/(t+f)*100, outl)
 
 def make_output(t, v, outl):
     """
